@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fahey.io/sitemap.xml
