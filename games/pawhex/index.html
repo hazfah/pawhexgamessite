@@ -40,12 +40,56 @@
 </section>
 
 <h2>How it plays</h2>
-<ul class="steps card">
-<li><img src="/assets/puppy.png" alt="A puppy" width="64" height="78"><span><strong>Puppies play in the mud.</strong> The darker the mud, the more puppies are on touching tiles.</span></li>
-<li><img src="/assets/kitten.png" alt="A kitten" width="64" height="73"><span><strong>Kittens leave paw prints.</strong> The more paw prints, the more kittens are on touching tiles.</span></li>
-<li><img src="/assets/treats.png" alt="Treats" width="64" height="64"><span><strong>Tap or swipe to flip a tile</strong> (careful not to scare a pet away!). <strong>Press and hold</strong> to offer a treat where you think a pet is hiding.</span></li>
-<li><img src="/assets/happy.png" alt="A happy puppy and kitten" width="64" height="64"><span><strong>No two puppies touch and no two kittens touch</strong> &mdash; but a puppy and a kitten can be neighbours.</span></li>
-</ul>
+<section class="howto" aria-roledescription="carousel" aria-label="How to play PawHex">
+<div class="howto-track" id="howto-track" tabindex="0">
+<figure class="howto-slide" id="howto-1" role="group" aria-roledescription="slide" aria-label="1 of 7"><img src="/assets/howto-1-puppies.png" alt="Find the puppies. Puppies play in the mud — the darker the mud, the more puppies are on touching tiles. The picture shows a puppy above four tiles: plain grass, then dirt marked 1, mud marked 2 and darker mud marked 3." width="720" height="604"></figure>
+<figure class="howto-slide" id="howto-2" role="group" aria-roledescription="slide" aria-label="2 of 7"><img src="/assets/howto-2-kittens.png" alt="Find the kittens. Kittens can be found by their paw prints — the more paw prints, the more kittens are on touching tiles. The picture shows a kitten above four tiles with no paw prints, then one, two and three." width="720" height="644" loading="lazy"></figure>
+<figure class="howto-slide" id="howto-3" role="group" aria-roledescription="slide" aria-label="3 of 7"><img src="/assets/howto-3-flip.png" alt="Tap or swipe to flip. Tap or swipe to flip a tile — but be careful not to scare a kitten or puppy away! The picture shows a scared-off kitten silhouette on a tile, with a finger tapping it." width="720" height="672" loading="lazy"></figure>
+<figure class="howto-slide" id="howto-4" role="group" aria-roledescription="slide" aria-label="4 of 7"><img src="/assets/howto-4-hold.png" alt="Hold to find. Long tap to offer a treat if you think there is a kitten or puppy hiding there — but if they are not there, you have wasted the treat! The picture shows a finger holding a tile while a green ring fills, with a treat beside it." width="720" height="748" loading="lazy"></figure>
+<figure class="howto-slide" id="howto-5" role="group" aria-roledescription="slide" aria-label="5 of 7"><img src="/assets/howto-5-no-two.png" alt="No two of a kind. Kittens never sit next to other kittens, and puppies never play next to other puppies — but kittens and puppies are sometimes found right next to each other." width="720" height="552" loading="lazy"></figure>
+<figure class="howto-slide" id="howto-6" role="group" aria-roledescription="slide" aria-label="6 of 7"><img src="/assets/howto-6-pass.png" alt="Pass or perfect? Find enough pets to solve the puzzle. Find them all with no mistakes (and no hints!) to earn a magic treat." width="720" height="520" loading="lazy"></figure>
+<figure class="howto-slide" id="howto-7" role="group" aria-roledescription="slide" aria-label="7 of 7"><img src="/assets/howto-7-magic.png" alt="Magic treats. Use a magic treat to instantly find any hidden puppies or kittens touching a discovered tile." width="720" height="544" loading="lazy"></figure>
+</div>
+<div class="howto-controls" id="howto-controls" hidden>
+<button type="button" class="btn btn-quiet" id="howto-prev">Back</button>
+<div class="howto-dots"><button type="button" class="howto-dot" data-i="0" aria-label="Go to card 1"></button><button type="button" class="howto-dot" data-i="1" aria-label="Go to card 2"></button><button type="button" class="howto-dot" data-i="2" aria-label="Go to card 3"></button><button type="button" class="howto-dot" data-i="3" aria-label="Go to card 4"></button><button type="button" class="howto-dot" data-i="4" aria-label="Go to card 5"></button><button type="button" class="howto-dot" data-i="5" aria-label="Go to card 6"></button><button type="button" class="howto-dot" data-i="6" aria-label="Go to card 7"></button></div>
+<button type="button" class="btn" id="howto-next">Next</button>
+</div>
+</section>
+<script>
+(function () {
+  var track = document.getElementById('howto-track');
+  var controls = document.getElementById('howto-controls');
+  if (!track || !controls) return;
+  controls.hidden = false;
+  var slides = track.querySelectorAll('.howto-slide');
+  var dots = controls.querySelectorAll('.howto-dot');
+  var prev = document.getElementById('howto-prev');
+  var next = document.getElementById('howto-next');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function current() { return Math.round(track.scrollLeft / track.clientWidth); }
+  function go(i) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    track.scrollTo({ left: i * track.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  function update() {
+    var i = current();
+    for (var d = 0; d < dots.length; d++) { dots[d].setAttribute('aria-current', d === i ? 'true' : 'false'); }
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+  }
+  prev.addEventListener('click', function () { go(current() - 1); });
+  next.addEventListener('click', function () { go(current() + 1); });
+  for (var d = 0; d < dots.length; d++) { dots[d].addEventListener('click', (function (n) { return function () { go(n); }; })(d)); }
+  track.addEventListener('scroll', function () { window.requestAnimationFrame(update); });
+  track.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(current() + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(current() - 1); }
+  });
+  window.addEventListener('resize', function () { go(current()); });
+  update();
+})();
+</script>
 
 <h2>What's inside</h2>
 <ul class="features">
